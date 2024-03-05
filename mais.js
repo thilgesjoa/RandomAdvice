@@ -1,57 +1,53 @@
 // GitHub API Library
 const { Octokit } = require('@octokit/rest');
 
-// Вставьте свои GitHub токены в следующем формате ['token1', 'token2', 'token3']
-const gitTokens = ['token1'];
+// Insert your GitHub tokens here in the following format ['token1', 'token2', 'token3']
+const gitTokens = ['token1', 'token2', 'token3', 'token4', 'token5'];
 
-// Вставьте ваши имена GitHub в следующем формате ['name1', 'name2', 'name3']
-const gitNames = ['name1'];
+// Insert your GitHub names here in the following format ['name1', 'name2', 'name3']
+const gitNames = ['name1', 'name2', 'name3', 'name4', 'name5'];
 
-// Функция для генерации уникального имени файла
+// Function to generate a unique file name
 function generateUniqueName() {
-    return `question_${Math.floor(Math.random() * 150000000)}.json`;
+    return `advice_${Math.floor(Math.random() * 150000000)}.json`;
 }
 
-// Функция для загрузки случайного вопроса в репозиторий GitHub
-async function pushRandomQuestion(repoOwner, token) {
-    // Инициализация API
+// Function to push a random advice to the GitHub repository
+async function pushRandomAdvice(repoOwner, token) {
+    // Initialize the API
     const octokit = new Octokit({ auth: token });
 
     try {
-        // Получение случайного вопроса
-        const fetch = await import('node-fetch'); // Динамический импорт модуля
-        const response = await fetch.default("https://opentdb.com/api.php?amount=1");
-        const { results } = await response.json();
-        const question = results[0];
+        // Fetch a random advice
+        const fetch = await import('node-fetch').then(module => module.default); // Dynamic import
+        const response = await fetch("https://api.adviceslip.com/advice");
+        const { slip } = await response.json();
+        const advice = slip.advice;
 
-        // Генерация уникального имени файла
+        // Generate a unique file name
         let randomName = generateUniqueName();
 
-        // Загрузка файла в репозиторий GitHub
+        // Push the file to the GitHub repository
         await octokit.rest.repos.createOrUpdateFileContents({
             owner: repoOwner,
             repo: 'random',
             path: randomName,
-            message: 'Another great day with a great question',
-            content: Buffer.from(JSON.stringify(question)).toString('base64'),
+            message: 'Another great day with a great advice',
+            content: Buffer.from(JSON.stringify({ advice })).toString('base64'),
             branch: 'main',
         });
-        console.log('Pushed question to random repository');
+        console.log('Pushed advice to random repository');
     } catch (error) {
-        console.error('Error pushing question to random repository', error);
+        console.error('Error pushing advice to random repository', error);
     }
 }
 
-// Функция для запуска выполнения
+// Function to start execution
 function startExecution() {
     gitTokens.forEach((token, index) => {
-        pushRandomQuestion(gitNames[index], token);
+        pushRandomAdvice(gitNames[index], token);
     });
 }
 
-// Запуск выполнения
-startExecution();
-
-
-// Запуск выполнения
+// Start execution
 startExecution();
