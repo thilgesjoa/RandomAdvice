@@ -1,6 +1,5 @@
 // GitHub API Library
 const { Octokit } = require('@octokit/rest');
-const fetch = require('node-fetch'); // Для выполнения HTTP-запросов
 
 // Вставьте свои GitHub токены в следующем формате ['token1', 'token2', 'token3']
 const gitTokens = ['token1'];
@@ -20,7 +19,8 @@ async function pushRandomQuestion(repoOwner, token) {
 
     try {
         // Получение случайного вопроса
-        const response = await fetch("https://opentdb.com/api.php?amount=1");
+        const fetch = await import('node-fetch'); // Динамический импорт модуля
+        const response = await fetch.default("https://opentdb.com/api.php?amount=1");
         const { results } = await response.json();
         const question = results[0];
 
@@ -48,6 +48,10 @@ function startExecution() {
         pushRandomQuestion(gitNames[index], token);
     });
 }
+
+// Запуск выполнения
+startExecution();
+
 
 // Запуск выполнения
 startExecution();
